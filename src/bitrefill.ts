@@ -1,3 +1,5 @@
+import { HttpRequest } from "./utils/http-request";
+
 export type BitrefillProps = {
   apiId: string;
   apiSecret: string;
@@ -15,5 +17,7 @@ export class Bitrefill {
     const authorizationHeader = Buffer.from(`${apiId}:${apiSecret}`).toString(
       "base64"
     );
+
+    const httpRequest = new HttpRequest({ authorizationHeader });
   }
 }
