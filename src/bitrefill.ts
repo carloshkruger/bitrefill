@@ -1,3 +1,4 @@
+import { Products } from "./resources/products";
 import { HttpRequest } from "./utils/http-request";
 
 export type BitrefillProps = {
@@ -6,6 +7,8 @@ export type BitrefillProps = {
 };
 
 export class Bitrefill {
+  public readonly products: Products;
+
   constructor({ apiId, apiSecret }: BitrefillProps) {
     if (typeof apiId !== "string" || apiId.trim().length === 0) {
       throw new Error("Invalid or missing 'apiId' property.");
@@ -19,5 +22,7 @@ export class Bitrefill {
     );
 
     const httpRequest = new HttpRequest({ authorizationHeader });
+
+    this.products = new Products(httpRequest);
   }
 }
