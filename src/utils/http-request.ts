@@ -14,8 +14,8 @@ type HttpRequestProps = {
 type ApiResponse = {
   meta: Record<string, any>;
   data: any;
-  message: string;
-  error_code: string;
+  message?: string;
+  error_code?: string;
 };
 
 const DEFAULT_BASE_URL = "https://api-bitrefill.com/v2";
@@ -37,7 +37,10 @@ export class HttpRequest {
     const data: ApiResponse = await response.json();
 
     if (!response.ok) {
-      throw new BitrefillError(data.message, data.error_code);
+      throw new BitrefillError(
+        data.message || "Internal server error",
+        data.error_code
+      );
     }
 
     return data.data;
