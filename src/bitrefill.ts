@@ -1,4 +1,5 @@
 import { Invoices } from "./resources/invoices";
+import { Orders } from "./resources/orders";
 import { Products } from "./resources/products";
 import { HttpRequest } from "./utils/http-request";
 
@@ -10,6 +11,7 @@ export type BitrefillProps = {
 export class Bitrefill {
   public readonly products: Products;
   public readonly invoices: Invoices;
+  public readonly orders: Orders;
 
   constructor({ apiId, apiSecret }: BitrefillProps) {
     if (typeof apiId !== "string" || apiId.trim().length === 0) {
@@ -27,5 +29,6 @@ export class Bitrefill {
 
     this.products = new Products(httpRequest);
     this.invoices = new Invoices(httpRequest);
+    this.orders = new Orders(httpRequest);
   }
 }
