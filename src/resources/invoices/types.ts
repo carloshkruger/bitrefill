@@ -12,7 +12,8 @@ export type CreateInvoiceProduct = {
   product_id: string;
 
   /**
-   * Only one of these fields (value or package_id) needs to be provided and it refers to either a value within the range of the product
+   * Only one of these fields (value or package_id) needs to be provided and
+   * it refers to either a value within the range of the product
    * or an id of a package from the packages list in the product.
    * Only one is required. For packages you can also provide the value field.
    * To note is that on packages, the value field can be a string.
@@ -38,41 +39,54 @@ export type CreateInvoiceProduct = {
   phone_number?: string;
 
   /**
-   * The email of the end user to receive the product. Optional and defaults to the API user email.
+   * The email of the end user to receive the product.
+   * Optional and defaults to the API user email.
    */
   email?: string;
 
   /**
-   * If we should send an email to email when the purchase is completed. Optional and defaults to false.
+   * If we should send an email to email when the purchase is completed.
+   * Optional and defaults to false.
    */
   send_email?: boolean;
 
   /**
-   * If we should send an SMS to numbers when the purchase is completed. Optional and defaults to false.
+   * If we should send an SMS to numbers when the purchase is completed.
+   * Optional and defaults to false.
    */
   send_sms?: boolean;
 };
 
-export type CreateInvoice = {
+type CreateBitcoinInvoice = {
   /**
-   * This is a list of the products to be bought. Most often, purchases can be done simply by product_id, quantity and value.
+   * The payment method for the invoice.
    */
-  products: CreateInvoiceProduct[];
+  payment_method: "bitcoin";
 
   /**
-   * If the invoice should be paid automatically. Optional and defaults to false. Only meaningful for a balance payment method.
+   * Where we send the payment back to if there's any issue with an already paid for purchase.
+   * Should be provided when paying with crypto currencies
+   */
+  refund_address: string;
+};
+
+type CreateBalanceInvoice = {
+  /**
+   * The payment method for the invoice.
+   */
+  payment_method: "balance";
+
+  /**
+   * If the invoice should be paid automatically. Optional and defaults to false.
    */
   auto_pay?: boolean;
+};
 
+export type CreateInvoice = (CreateBitcoinInvoice | CreateBalanceInvoice) & {
   /**
-   * The payment method for the invoice. Available values right now are balance and bitcoin. Optional and defaults to balance.
+   * This is a list of the products to be bought.
    */
-  payment_method: PaymentMethod;
-
-  /**
-   * Where we send the payment back to if there's any issue with an already paid for purchase. Should be provided when paying with crypto currencies
-   */
-  refund_address?: string;
+  products: CreateInvoiceProduct[];
 
   /**
    * A url that we should send the invoice to when it reaches the final stage.

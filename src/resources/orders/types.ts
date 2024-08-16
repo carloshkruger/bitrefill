@@ -1,17 +1,17 @@
 import type { BaseQueryFilters, BaseTimeFilters } from "../../common/types";
 
-export type OrderStatus = "created";
+export type OrderStatus = "created" | "delivered";
 
 export type RedemptionInfo = {
-  code: string;
-  link: string;
-  pin: string;
-  barcode_format: string;
-  barcode_value: string;
-  instructions: string;
-  expiration_date: string;
-  other: string;
-  extra_fields: Record<string, any>;
+  code?: string;
+  link?: string;
+  pin?: string;
+  barcode_format?: string;
+  barcode_value?: string;
+  instructions?: string;
+  expiration_date?: string;
+  other?: string;
+  extra_fields?: Record<string, any>;
 };
 
 export type Order = {
