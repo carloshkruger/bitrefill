@@ -1,5 +1,6 @@
 import { version as packageVersion } from "../../package.json";
 import { BitrefillError } from "./bitrefill-error";
+import { fetchRetry } from "./fetch-retry";
 
 type Headers = {
   "User-Agent": string;
@@ -32,18 +33,28 @@ export class HttpRequest {
     };
   }
 
-  private async fetchRequest(path: string, options = {}): Promise<any> {
-    const response = await fetch(`${DEFAULT_BASE_URL}${path}`, options);
-    const data: ApiResponse = await response.json();
+  private async fetchRequest(path: string, options: RequestInit): Promise<any> {
+    try {
+      const response = await fetchRetry(`${DEFAULT_BASE_URL}${path}`, options);
+      const data: ApiResponse = await response.json();
 
-    if (!response.ok) {
+      if (!response.ok) {
+        throw new BitrefillError(
+          data.message || "Internal server error",
+          data.error_code
+        );
+      }
+
+      return data.data;
+    } catch (error: any) {
+      if (error instanceof BitrefillError) {
+        throw error;
+      }
+
       throw new BitrefillError(
-        data.message || "Internal server error",
-        data.error_code
+        `Error trying to make the HTTP request: ${error.message}`
       );
     }
-
-    return data.data;
   }
 
   async get(path: string) {
