@@ -33,7 +33,10 @@ export class HttpRequest {
     };
   }
 
-  private async fetchRequest(path: string, options: RequestInit): Promise<any> {
+  private async fetchRequest(
+    path: string,
+    options: RequestInit
+  ): Promise<ApiResponse> {
     try {
       const response = await fetchRetry(`${DEFAULT_BASE_URL}${path}`, options);
       const data: ApiResponse = await response.json();
@@ -45,7 +48,7 @@ export class HttpRequest {
         );
       }
 
-      return data.data;
+      return data;
     } catch (error: any) {
       if (error instanceof BitrefillError) {
         throw error;
@@ -57,7 +60,7 @@ export class HttpRequest {
     }
   }
 
-  async get(path: string) {
+  async get(path: string): Promise<ApiResponse> {
     const requestOptions = {
       method: "GET",
       headers: this.headers,
@@ -66,7 +69,7 @@ export class HttpRequest {
     return this.fetchRequest(path, requestOptions);
   }
 
-  async post(path: string, body: Record<any, any>) {
+  async post(path: string, body: Record<any, any>): Promise<ApiResponse> {
     const requestOptions = {
       method: "POST",
       headers: this.headers,

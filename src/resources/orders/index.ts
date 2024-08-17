@@ -10,13 +10,15 @@ export class Orders {
    */
   public async list(params: ListOrdersParams = {}): Promise<Order[]> {
     const urlParams = convertObjectToUrlQueryParams(params);
-    return this.request.get(`/orders?${urlParams.toString()}`);
+    const response = await this.request.get(`/orders?${urlParams.toString()}`);
+    return response.data;
   }
 
   /**
    * Retrieve an order by id.
    */
   public async retrieve(id: string): Promise<Order> {
-    return this.request.get(`/orders/${id}`);
+    const response = await this.request.get(`/orders/${id}`);
+    return response.data;
   }
 }

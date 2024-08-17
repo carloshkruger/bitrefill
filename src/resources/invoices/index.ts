@@ -10,21 +10,26 @@ export class Invoices {
    */
   public async list(params: ListInvoicesParams = {}): Promise<Invoice[]> {
     const urlParams = convertObjectToUrlQueryParams(params);
-    return this.request.get(`/invoices?${urlParams.toString()}`);
+    const response = await this.request.get(
+      `/invoices?${urlParams.toString()}`
+    );
+    return response.data;
   }
 
   /**
    * Retrieve a specific invoice by its id
    */
   public async retrieve(id: string): Promise<Invoice> {
-    return this.request.get(`/invoices/${id}`);
+    const response = await this.request.get(`/invoices/${id}`);
+    return response.data;
   }
 
   /**
    * Create the invoice
    */
   public async create(data: CreateInvoice): Promise<Invoice> {
-    return this.request.post("/invoices", data);
+    const response = await this.request.post("/invoices", data);
+    return response.data;
   }
 
   /**
@@ -32,6 +37,7 @@ export class Invoices {
    * Can only be used for invoices with "balance" payment method
    */
   public async pay(id: string): Promise<Invoice> {
-    return this.request.post(`/invoices/${id}/pay`, {});
+    const response = await this.request.post(`/invoices/${id}/pay`, {});
+    return response.data;
   }
 }

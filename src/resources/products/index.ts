@@ -16,7 +16,8 @@ export class Products {
     params: ListProductsWithPaginationParams = {}
   ): Promise<Product[]> {
     const urlParams = convertObjectToUrlQueryParams(params);
-    return this.request.get(`/products?${urlParams}`);
+    const response = await this.request.get(`/products?${urlParams}`);
+    return response.data;
   }
 
   /**
@@ -36,9 +37,9 @@ export class Products {
 
       const urlParams = convertObjectToUrlQueryParams(allParams);
       const response = await this.request.get(`/products?${urlParams}`);
-      products.push(...response);
+      products.push(...response.data);
 
-      if (response.length < limit) {
+      if (response.data.length < limit) {
         hasMore = false;
       } else {
         start += limit;
@@ -52,6 +53,7 @@ export class Products {
    * Retrieve a specific product by its id.
    */
   public async retrieve(id: string): Promise<Product> {
-    return this.request.get(`/products/${id}`);
+    const response = await this.request.get(`/products/${id}`);
+    return response.data;
   }
 }

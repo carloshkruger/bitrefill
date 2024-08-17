@@ -13,15 +13,17 @@ export class Misc {
   /**
    * Ping server
    */
-  public async ping(): Promise<void> {
-    await this.request.get("/ping");
+  public async ping(): Promise<string> {
+    const response = await this.request.get("/ping");
+    return response.message!;
   }
 
   /**
    * Retrieves the account balance
    */
   public async accountBalance(): Promise<AccountBalance> {
-    return this.request.get("/accounts/balance");
+    const response = await this.request.get("/accounts/balance");
+    return response.data;
   }
 
   /**
@@ -34,13 +36,15 @@ export class Misc {
     params: CheckPhoneNumberParams
   ): Promise<Provider | Provider[]> {
     const urlParams = convertObjectToUrlQueryParams(params);
-    return this.request.get(`/check_phone_number?${urlParams}`);
+    const response = await this.request.get(`/check_phone_number?${urlParams}`);
+    return response.data;
   }
 
   /**
    * List your commissions as an affiliate. (FOR AFFILIATES ONLY)
    */
   public async commissions(): Promise<Commission[]> {
-    return this.request.get("/commissions");
+    const response = await this.request.get("/commissions");
+    return response.data;
   }
 }
