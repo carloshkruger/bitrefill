@@ -26,23 +26,19 @@ export class Products {
   public async listAll(params: ListProductsParams = {}): Promise<Product[]> {
     const products: Product[] = [];
     const allParams = { ...params, start: 0, limit: 50 };
+    const queryParamsWithoutPagination = convertObjectToUrlQueryParams(params);
+    const initialQueryParams = convertObjectToUrlQueryParams(allParams);
 
-    let hasMore = true;
-    let start = 0;
-    let limit = 50;
+    let endpoint: string | null = `/products?${initialQueryParams}`;
 
-    while (hasMore) {
-      allParams.start = start;
-      allParams.limit = limit;
-
-      const urlParams = convertObjectToUrlQueryParams(allParams);
-      const response = await this.request.get(`/products?${urlParams}`);
+    while (endpoint) {
+      const response = await this.request.get(endpoint);
       products.push(...response.data);
 
-      if (response.data.length < limit) {
-        hasMore = false;
-      } else {
-        start += limit;
+      endpoint = response.meta._next || null;
+
+      if (endpoint) {
+        endpoint = `${endpoint}&${queryParamsWithoutPagination}`;
       }
     }
 

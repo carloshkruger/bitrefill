@@ -70,23 +70,35 @@ describe("Products", () => {
       }
 
       // It will make 2 requests. The first one will return 50 products, and the second one will return 1 product
-      const jestSpy = jest
+      const fetchSpy = jest
         .spyOn(global, "fetch")
         .mockResolvedValueOnce({
           ok: true,
           json: jest.fn().mockResolvedValue({
             data: products.slice(0, PRODUCTS_PER_REQUEST),
+            meta: {
+              _next: "endpoint.com/products?limit=50&start=50",
+            },
           }),
         } as any)
         .mockResolvedValueOnce({
           ok: true,
-          json: jest
-            .fn()
-            .mockResolvedValue({ data: products.slice(PRODUCTS_PER_REQUEST) }),
+          json: jest.fn().mockResolvedValue({
+            data: products.slice(PRODUCTS_PER_REQUEST),
+            meta: { _next: null },
+          }),
         } as any);
 
-      await expect(bitrefill.products.listAll()).resolves.toEqual(products);
-      expect(jestSpy).toHaveBeenCalledTimes(2);
+      await expect(
+        bitrefill.products.listAll({ include_test_products: true })
+      ).resolves.toEqual(products);
+
+      const fetchUrl1 = fetchSpy.mock.calls[0][0];
+      const fetchUrl2 = fetchSpy.mock.calls[1][0];
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      expect(fetchUrl1).toContain("include_test_products=true");
+      expect(fetchUrl2).toContain("include_test_products=true");
     });
   });
 

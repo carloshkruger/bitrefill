@@ -38,7 +38,11 @@ export class HttpRequest {
     options: RequestInit
   ): Promise<ApiResponse> {
     try {
-      const response = await fetchRetry(`${DEFAULT_BASE_URL}${path}`, options);
+      const url = path.startsWith(DEFAULT_BASE_URL)
+        ? path
+        : `${DEFAULT_BASE_URL}${path}`;
+
+      const response = await fetchRetry(url, options);
       const data: ApiResponse = await response.json();
 
       if (!response.ok) {
