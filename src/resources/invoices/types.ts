@@ -8,7 +8,12 @@ export type PaymentStatus =
   | "payment_confirmed"
   | "complete";
 
-export type InvoiceStatus = "not_delivered" | "delivered" | "all_delivered";
+export type InvoiceStatus =
+  | "not_delivered"
+  | "delivered"
+  | "all_delivered"
+  | "all_error"
+  | "partial_delivery";
 
 export type CreateInvoiceProduct = {
   /**
@@ -97,6 +102,13 @@ export type CreateInvoice = (CreateBitcoinInvoice | CreateBalanceInvoice) & {
    * A url that we should send the invoice to when it reaches the final stage.
    */
   webhook_url?: string;
+};
+
+export type CreateOptions = {
+  /**
+   * This function will be called in the background when the invoice is completed
+   */
+  onInvoiceCompleted?: (invoice: Invoice) => Promise<void>;
 };
 
 export type Invoice = {

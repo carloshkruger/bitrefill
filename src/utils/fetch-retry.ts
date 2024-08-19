@@ -8,14 +8,20 @@ type RetryConfig = {
 
 type FetchRetryConfig = {
   timeout: number;
+  shouldWaitOnRateLimit?: boolean;
   retryConfig?: RetryConfig;
 };
 
 export async function fetchRetry(
   endpointUrl: string,
   fetchParams: RequestInit,
-  { timeout, retryConfig = { retries: 4, factor: 2 } }: FetchRetryConfig
+  config: FetchRetryConfig
 ): Promise<any> {
+  const {
+    timeout,
+    shouldWaitOnRateLimit = false,
+    retryConfig = { retries: 4, factor: 2 }
+  } = config;
   let retries = 0;
   let timeoutId: NodeJS.Timeout | undefined = undefined;
 
@@ -33,7 +39,10 @@ export async function fetchRetry(
       signal: abortController.signal
     });
 
-    if (response.status >= 500) {
+    if (
+      response.status >= 500 ||
+      (shouldWaitOnRateLimit && response.status === 429)
+    ) {
       retries++;
       if (retries === retryConfig.retries) {
         const errorResponse = await response.json();
@@ -43,7 +52,17 @@ export async function fetchRetry(
         );
       }
 
-      const delayMs = retryConfig.factor ** retries * 1000;
+      let delayMs = retryConfig.factor ** retries * 1000;
+
+      if (response.status === 429) {
+        const retryAfterSeconds = Number(
+          response.headers.get("retry-after") ?? 0
+        );
+        if (retryAfterSeconds) {
+          delayMs = retryAfterSeconds * 1000;
+        }
+      }
+
       console.log(`Retrying in ${delayMs / 1000} seconds...`);
 
       await sleep(delayMs);

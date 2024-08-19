@@ -20,6 +20,11 @@ type ApiResponse = {
   error_code?: string;
 };
 
+type RequestConfig = {
+  shouldWaitOnRateLimit?: boolean;
+  timeout?: number;
+};
+
 const DEFAULT_BASE_URL = "https://api-bitrefill.com/v2";
 const DEFAULT_USER_AGENT = `bitrefill-node:${packageVersion}`;
 
@@ -38,15 +43,18 @@ export class HttpRequest {
 
   private async fetchRequest(
     path: string,
-    options: RequestInit
+    options: RequestInit,
+    config: RequestConfig = {}
   ): Promise<ApiResponse> {
     try {
       const url = path.startsWith(DEFAULT_BASE_URL)
         ? path
         : `${DEFAULT_BASE_URL}${path}`;
+      const timeout = config.timeout || this.timeout;
 
       const response = await fetchRetry(url, options, {
-        timeout: this.timeout
+        timeout,
+        shouldWaitOnRateLimit: config.shouldWaitOnRateLimit
       });
       const data: ApiResponse = await response.json();
 
@@ -69,13 +77,16 @@ export class HttpRequest {
     }
   }
 
-  async get(path: string): Promise<ApiResponse> {
+  async get(
+    path: string,
+    requestConfig: RequestConfig = {}
+  ): Promise<ApiResponse> {
     const requestOptions = {
       method: "GET",
       headers: this.headers
     };
 
-    return this.fetchRequest(path, requestOptions);
+    return this.fetchRequest(path, requestOptions, requestConfig);
   }
 
   async post(path: string, body: Record<any, any>): Promise<ApiResponse> {
