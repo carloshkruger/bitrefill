@@ -90,6 +90,32 @@ const birefill = new Birefill({
   // }
 ```
 
+### Create an invoice and execute a callback when the invoice is completed
+
+#### This callback is executed in the background
+
+```js
+  // Use the attribute "auto_pay" = true
+  await bitrefill.invoices.create(
+    {
+      products: [
+        {
+          product_id: "product_1",
+          value: 10,
+          quantity: 1
+        }
+      ],
+      payment_method: "balance",
+      auto_pay: true,
+    },
+    {
+      onInvoiceCompleted: async (invoice: Invoice) => {
+        console.log(invoice)
+      }
+    }
+  )
+```
+
 ### Retrieve an invoice
 
 ```js
