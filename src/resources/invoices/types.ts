@@ -1,7 +1,12 @@
 import type { BaseQueryFilters, BaseTimeFilters } from "../../common/types";
+import type { OrderStatus, RedemptionInfo } from "../orders/types";
 
 export type PaymentMethod = "balance" | "bitcoin";
-export type PaymentStatus = "unpaid" | "paid";
+export type PaymentStatus =
+  | "unpaid"
+  | "paid"
+  | "payment_confirmed"
+  | "complete";
 
 export type InvoiceStatus = "not_delivered" | "delivered" | "all_delivered";
 
@@ -97,7 +102,7 @@ export type CreateInvoice = (CreateBitcoinInvoice | CreateBalanceInvoice) & {
 export type Invoice = {
   id: string;
   created_time: string;
-  completed_time: string;
+  completed_time?: string;
   status: InvoiceStatus;
   user: {
     id: string;
@@ -105,15 +110,15 @@ export type Invoice = {
   };
   payment: {
     method: PaymentMethod;
-    address: string;
     currency: string;
     price: number;
     status: PaymentStatus;
     commission: number;
+    address?: string;
   };
   orders: {
     id: string;
-    status: string;
+    status: OrderStatus;
     product: {
       id: string;
       name: string;
@@ -123,7 +128,8 @@ export type Invoice = {
       _href: string;
     };
     created_time: string;
-    delivered_time: string;
+    delivered_time: string | null;
+    redemption_info?: RedemptionInfo;
   }[];
 };
 
