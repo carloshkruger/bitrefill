@@ -6,15 +6,32 @@ type RetryConfig = {
   factor: number;
 };
 
-export function fetchRetry(
+type FetchRetryConfig = {
+  timeout: number;
+  retryConfig?: RetryConfig;
+};
+
+export async function fetchRetry(
   endpointUrl: string,
   fetchParams: RequestInit,
-  retryConfig: RetryConfig = { retries: 4, factor: 2 }
+  { timeout, retryConfig = { retries: 4, factor: 2 } }: FetchRetryConfig
 ): Promise<any> {
   let retries = 0;
+  let timeoutId: NodeJS.Timeout | undefined = undefined;
+
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new BitrefillError("Request timed out"));
+    }, timeout);
+  });
+
+  const abortController = new AbortController();
 
   const fetchData = async () => {
-    const response = await fetch(endpointUrl, fetchParams);
+    const response = await fetch(endpointUrl, {
+      ...fetchParams,
+      signal: abortController.signal
+    });
 
     if (response.status >= 500) {
       retries++;
@@ -37,5 +54,13 @@ export function fetchRetry(
     return response;
   };
 
-  return fetchData();
+  try {
+    const response = await Promise.race([timeoutPromise, fetchData()]);
+    return response;
+  } catch (error) {
+    abortController.abort();
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }

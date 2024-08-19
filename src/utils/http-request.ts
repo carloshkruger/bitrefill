@@ -10,6 +10,7 @@ type Headers = {
 
 type HttpRequestProps = {
   authorizationHeader: string;
+  timeout: number;
 };
 
 type ApiResponse = {
@@ -23,14 +24,16 @@ const DEFAULT_BASE_URL = "https://api-bitrefill.com/v2";
 const DEFAULT_USER_AGENT = `bitrefill-node:${packageVersion}`;
 
 export class HttpRequest {
+  private readonly timeout: number;
   private readonly headers: Headers;
 
-  constructor({ authorizationHeader }: HttpRequestProps) {
+  constructor({ authorizationHeader, timeout }: HttpRequestProps) {
     this.headers = {
       Authorization: authorizationHeader,
       "User-Agent": DEFAULT_USER_AGENT,
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     };
+    this.timeout = timeout;
   }
 
   private async fetchRequest(
@@ -42,7 +45,9 @@ export class HttpRequest {
         ? path
         : `${DEFAULT_BASE_URL}${path}`;
 
-      const response = await fetchRetry(url, options);
+      const response = await fetchRetry(url, options, {
+        timeout: this.timeout
+      });
       const data: ApiResponse = await response.json();
 
       if (!response.ok) {
@@ -67,7 +72,7 @@ export class HttpRequest {
   async get(path: string): Promise<ApiResponse> {
     const requestOptions = {
       method: "GET",
-      headers: this.headers,
+      headers: this.headers
     };
 
     return this.fetchRequest(path, requestOptions);
@@ -77,7 +82,7 @@ export class HttpRequest {
     const requestOptions = {
       method: "POST",
       headers: this.headers,
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     };
 
     return this.fetchRequest(path, requestOptions);

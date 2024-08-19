@@ -4,9 +4,16 @@ import { Orders } from "./resources/orders";
 import { Products } from "./resources/products";
 import { HttpRequest } from "./utils/http-request";
 
+const DEFAULT_TIMEOUT_IN_MS = 80_000;
+
 export type BitrefillProps = {
   apiId: string;
   apiSecret: string;
+  /**
+   * Request timeout in milliseconds.
+   * The default is 80000, 1 minute and 20 seconds
+   */
+  timeout?: number;
 };
 
 export class Bitrefill {
@@ -15,7 +22,11 @@ export class Bitrefill {
   public readonly orders: Orders;
   public readonly misc: Misc;
 
-  constructor({ apiId, apiSecret }: BitrefillProps) {
+  constructor({
+    apiId,
+    apiSecret,
+    timeout = DEFAULT_TIMEOUT_IN_MS
+  }: BitrefillProps) {
     if (typeof apiId !== "string" || apiId.trim().length === 0) {
       throw new Error("Invalid or missing 'apiId' property.");
     }
@@ -27,7 +38,7 @@ export class Bitrefill {
       "base64"
     );
 
-    const httpRequest = new HttpRequest({ authorizationHeader });
+    const httpRequest = new HttpRequest({ authorizationHeader, timeout });
 
     this.products = new Products(httpRequest);
     this.invoices = new Invoices(httpRequest);
