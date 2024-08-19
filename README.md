@@ -2,6 +2,8 @@
 
 Node.js library for the Bitrefill B2B API.
 
+There is a demo file (src/demo.ts). To execute it, run npm run demo.
+
 ## Install
 
 This is just a demonstration of how this library would be used. It is not published on NPM.
