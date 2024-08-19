@@ -3,7 +3,7 @@ import { convertObjectToUrlQueryParams } from "../../utils/convertObjectToUrlQue
 import type {
   ListProductsParams,
   ListProductsWithPaginationParams,
-  Product,
+  Product
 } from "./types";
 
 export class Products {

@@ -4,7 +4,7 @@ import type {
   AccountBalance,
   CheckPhoneNumberParams,
   Commission,
-  Provider,
+  Provider
 } from "./types";
 
 export class Misc {
